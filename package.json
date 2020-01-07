@@ -1,6 +1,7 @@
 {
   "name": "koact-doc-to-definition",
   "main": "./build/index.js",
+  "bin": "./build/cli.js",
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf ./build",
@@ -9,9 +10,10 @@
     "lint": "tslint -c tslint.json ./src/**/*.ts",
     "prebuild": "yarn run lint && yarn test && yarn run clean",
     "prepublishOnly": "yarn build",
-    "test": "mocha --require ts-node/register ./test/*.spec.ts"
+    "test": "mocha --require ts-node/register ./test/*.spec.ts",
+    "start-koa-server": "ts-node ./test/startKoaServer.ts"
   },
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": false,
   "license": "MIT",
   "author": "MiseryLee <miserylee@foxmail.com>",
@@ -23,11 +25,20 @@
   "devDependencies": {
     "@types/mocha": "5.2.7",
     "@types/node": "13.1.4",
+    "koa": "^2.11.0",
+    "koact": "^5.3.2",
     "mocha": "7.0.0",
     "pre-commit": "1.2.2",
+    "schema.io": "^0.6.6",
     "ts-node": "8.5.4",
     "tslint": "5.20.1",
-    "tslint-clean-code": "0.2.10",
-    "typescript": "3.7.4"
+    "tslint-clean-code": "0.2.10"
+  },
+  "dependencies": {
+    "@types/fs-extra": "^8.0.1",
+    "axios": "^0.19.0",
+    "commander": "^4.1.0",
+    "fs-extra": "^8.1.0",
+    "typescript": "^3.7.4"
   }
 }
