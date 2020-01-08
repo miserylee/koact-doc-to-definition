@@ -29,7 +29,8 @@
       false
     ],
     "max-classes-per-file": false,
-    "no-namespace": false
+    "no-namespace": false,
+    "no-bitwise": false
   },
   "rulesDirectory": []
 }

@@ -5,10 +5,16 @@ export default {
   query: {
     foo: $(String).required().explain('Foo'),
   },
-  res: $(String).required().explain('Bar'),
+  res: $({
+    bar: $(String).required().explain('bar'),
+  }).required().explain('Bar'),
   async handler({ query }) {
-    return `Foo:${query.foo}`;
+    return {
+      bar: `Foo:${query.foo}`,
+    };
   },
 } as IAPI<{}, {
   foo: string;
-}, {}, string>;
+}, {}, {
+  bar: string;
+}>;
