@@ -17,6 +17,7 @@ describe('Main', () => {
     await koactDocToDefinition({
       url: baseUrl,
       destination,
+      docSecret: '123456',
     });
     const exists = existsSync(path.resolve(destination, 'APIRoot.ts'));
     assert(exists, 'api file should exists.');

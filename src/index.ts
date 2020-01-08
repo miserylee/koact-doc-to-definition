@@ -8,6 +8,7 @@ import ts = require('typescript');
 export interface IOptions {
   url: string;
   destination: string;
+  docSecret?: string;
 }
 
 export interface IKoactMeta {
@@ -47,8 +48,10 @@ function headToUpperCase(str: string) {
   return `${str[0].toUpperCase()}${str.slice(1)}`;
 }
 
-async function fetchDoc(baseUrl: string, path: string) {
-  const { data } = await Axios.get<IKoactDoc>(`${baseUrl}${path}`);
+async function fetchDoc(baseUrl: string, path: string, docSecret?: string) {
+  const { data } = await Axios.get<IKoactDoc>(`${baseUrl}${path}`, {
+    params: { docSecret },
+  });
   return data;
 }
 
@@ -164,7 +167,7 @@ export default async function koactDocToDefinition(options: IOptions) {
       return headToUpperCase(e);
     }).join('')}`;
     console.log('Create module:', moduleName);
-    const doc = await fetchDoc(baseUrl, path);
+    const doc = await fetchDoc(baseUrl, path, options.docSecret);
 
     const importNodes: ts.Node[] = [
       ts.addSyntheticLeadingComment(ts.createIdentifier(''), ts.SyntaxKind.MultiLineCommentTrivia, ' tslint:disable ', true),

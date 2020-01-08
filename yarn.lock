@@ -872,10 +872,10 @@ koa@^2.11.0:
     type-is "^1.6.16"
     vary "^1.1.2"
 
-koact@^5.3.2:
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/koact/-/koact-5.3.2.tgz#104160a355ddd574feb8b28eb22971433afc0867"
-  integrity sha512-f0lJb/W/b/r5miOFQQTEVEDubF1PtkFprI/6QLC+DypmEylXCVHSnZl905sZGgILTfOA/2ZMYY+KCqnbQNeD9w==
+koact@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/koact/-/koact-5.4.0.tgz#a3d6d2d1cd95b609416ade95db288867ce48eb56"
+  integrity sha512-kj4oJhzMEvojT0agKRo2p9aUbFVLXXv3dCpPr8K95pdx1MyK9PXZYb7LsL5/QtWDaJK6TWCtyhcaz8KIj1A7Gg==
   dependencies:
     "@types/formidable" "^1.0.31"
     "@types/koa-router" "^7.0.32"

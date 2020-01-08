@@ -5,7 +5,9 @@ import * as path from 'path';
 
 const app = new Application();
 
-app.use(koact(path.resolve(__dirname, 'routes')));
+app.use(koact(path.resolve(__dirname, 'routes'), [], {
+  docSecret: '123456',
+}));
 
 let server: Server;
 
