@@ -13,7 +13,7 @@
     "test": "mocha --require ts-node/register ./test/*.spec.ts",
     "start-koa-server": "ts-node ./test/startKoaServer.ts"
   },
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": false,
   "license": "MIT",
   "author": "MiseryLee <miserylee@foxmail.com>",
