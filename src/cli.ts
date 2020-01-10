@@ -2,7 +2,7 @@
 import * as program from 'commander';
 import { existsSync } from 'fs';
 import * as path from 'path';
-import koactDocToDefinition from './index';
+import koactDocToDefinition, { IOptions } from './index';
 
 program.version(require(path.resolve(__dirname, '../package.json')).version)
   .option('-c, --config [configFilePath]', 'Set config file path.', 'koact-api-generator.config.json')
@@ -13,16 +13,16 @@ if (!existsSync(configFilePath)) {
   throw new Error('No configuration found.');
 }
 
-const { destination, url } = require(configFilePath) as { destination: string; url: string };
+const options = require(configFilePath) as IOptions;
 
-if (!destination) {
+if (!options.destination) {
   throw new Error('`destination` should set in config file.');
 }
-if (!url) {
+if (!options.url) {
   throw new Error('`url` should set in config file.');
 }
 
-koactDocToDefinition({ destination, url }).then(() => {
+koactDocToDefinition(options).then(() => {
   console.log('Generate api files done!');
 }).catch(e => {
   throw e;

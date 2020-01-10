@@ -5,6 +5,15 @@ import * as path from 'path';
 
 const app = new Application();
 
+app.use(async (ctx, next) => {
+  console.log(new Date(), ctx.method, ctx.url);
+  try {
+    await next();
+  } catch (e) {
+    console.error(e.message);
+    throw e;
+  }
+});
 app.use(koact(path.resolve(__dirname, 'routes'), [], {
   docSecret: '123456',
 }));
