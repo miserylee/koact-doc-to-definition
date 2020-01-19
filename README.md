@@ -4,16 +4,24 @@
 
 # 怎么使用？
 
-使用`npm`或`yarn`全局安装`koa-doc-to-definition`
+使用`npm`或`yarn`全局安装`koact-doc-to-definition`
 
 在项目根目录下创建配置文件`koact-api-generator.config.json`：
 
 ```json
 {
   "url": "http://localhost:3000",
-  "destination": "./apis"
+  "destination": "test/apis/axios",
+  "docSecret": "123456",
+  "target": "axios",
+  "pattern": [
+    "**",
+    "!/ms/*"
+  ]
 }
 ```
+
+**注意：`destination`配置是相对于命令执行目录的地址**
 
 ```typescript
 // 配置文件数据结构
@@ -31,3 +39,7 @@ export interface IOptions {
 在项目目录下执行`koact-doc-to-definition`指令即可。
 
 可使用`--config [config-file-path]`来指定配置文件的地址，默认为`koact-api-generator.config.json`。
+
+# 多个服务出口的情况
+
+可以将`koact-api-generator.config.json`配置为`IOptions[]`的格式即可。

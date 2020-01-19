@@ -11,9 +11,10 @@
     "prebuild": "yarn run lint && yarn test && yarn run clean",
     "prepublishOnly": "yarn build",
     "test": "mocha --require ts-node/register ./test/*.spec.ts",
-    "start-koa-server": "ts-node ./test/startKoaServer.ts"
+    "start-koa-server": "ts-node ./test/startKoaServer.ts",
+    "gen-api": "chmod +x ./build/cli.js && ./build/cli.js -c test/koact-api-generator.config.json"
   },
-  "version": "0.1.4",
+  "version": "0.2.0",
   "private": false,
   "license": "MIT",
   "author": "MiseryLee <miserylee@foxmail.com>",

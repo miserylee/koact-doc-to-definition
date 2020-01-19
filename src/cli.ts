@@ -13,17 +13,23 @@ if (!existsSync(configFilePath)) {
   throw new Error('No configuration found.');
 }
 
-const options = require(configFilePath) as IOptions;
+let optionsArray = require(configFilePath) as IOptions | IOptions[];
 
-if (!options.destination) {
-  throw new Error('`destination` should set in config file.');
-}
-if (!options.url) {
-  throw new Error('`url` should set in config file.');
+if (!Array.isArray(optionsArray)) {
+  optionsArray = [optionsArray];
 }
 
-koactDocToDefinition(options).then(() => {
-  console.log('Generate api files done!');
-}).catch(e => {
+(async () => {
+  for (const [index, options] of optionsArray.entries()) {
+    if (!options.destination) {
+      throw new Error(`[Config_${index}] 'destination' should set in config file.`);
+    }
+    if (!options.url) {
+      throw new Error(`[Config_${index}] 'url' should set in config file.`);
+    }
+    await koactDocToDefinition(options);
+    console.log(`[Config_${index}] Generate api files done!`);
+  }
+})().catch(e => {
   throw e;
 });

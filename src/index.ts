@@ -1,8 +1,7 @@
 import Axios, { Method } from 'axios';
-import { rmdirSync } from 'fs';
-import { ensureDirSync, writeFileSync } from 'fs-extra';
+import { ensureDirSync, rmdirSync, writeFileSync } from 'fs-extra';
 import * as multimatch from 'multimatch';
-import { parse, resolve } from 'path';
+import { parse, relative, resolve } from 'path';
 import { ISummary } from 'schema.io';
 import ts = require('typescript');
 import * as url from 'url';
@@ -161,7 +160,7 @@ export default async function koactDocToDefinition(options: IOptions) {
   console.log(`Ensure destination: ${options.destination}`);
   ensureDirSync(options.destination);
 
-  const basePath = url.parse(options.url).pathname;
+  const basePath = url.parse(options.url).pathname || '/';
   console.log('Base path is:', basePath);
 
   function emitToFile(code: string, moduleName: string) {
@@ -303,8 +302,8 @@ export default async function koactDocToDefinition(options: IOptions) {
             ...(doc.apis.reduce<ts.ClassElement[]>((memo, api) => {
               Object.keys(api.version).forEach(version => {
                 const apiData = api.version[version];
-                const apiPath = api.path.replace(new RegExp(`^${basePath}`), '');
-                const apiName = api.method.toLowerCase() + apiPath.slice(1).split('/').map(e => {
+                const apiPath = relative(basePath, api.path);
+                const apiName = api.method.toLowerCase() + apiPath.split('/').map(e => {
                   if (!e) {
                     return 'Root';
                   }
@@ -320,7 +319,7 @@ export default async function koactDocToDefinition(options: IOptions) {
                 const responseTypeNodeCheckOptional = apiData.res?.required ? responseTypeNode : ts.createUnionTypeNode([responseTypeNode, ts.createTypeReferenceNode('undefined', undefined)]);
                 const parameters: ts.ParameterDeclaration[] = [];
                 const questionToken = ts.createToken(ts.SyntaxKind.QuestionToken);
-                let apiPathExpression: ts.Expression = ts.createStringLiteral(apiPath);
+                let apiPathExpression: ts.Expression = ts.createStringLiteral(`/${apiPath}`);
                 if (apiData.params) {
                   if (apiData.params.type === 'Object') {
                     Object.keys(apiData.params.object!).forEach(key => {
@@ -583,13 +582,20 @@ export default async function koactDocToDefinition(options: IOptions) {
               ])),
               ts.createExpressionStatement(ts.createAssignment(ts.createPropertyAccess(ts.createThis(), '_msio'), ts.createIdentifier('msio'))),
               ts.createExpressionStatement(ts.createAssignment(ts.createPropertyAccess(ts.createThis(), '_service'), ts.createPropertyAccess(ts.createIdentifier('destination'), 'service'))),
+              ...(subModuleNames.map(subModuleName => ts.createExpressionStatement(ts.createAssignment(
+                ts.createPropertyAccess(ts.createThis(), subModuleName.replace(/^IO/, 'io')),
+                ts.createNew(ts.createIdentifier(subModuleName), undefined, [
+                  ts.createIdentifier('msio'),
+                  ts.createIdentifier('destination'),
+                ]),
+              )))),
             ], true)),
             ...(doc.apis.reduce<ts.ClassElement[]>((memo, api) => {
               // msio ignore version, only use the default version.
               if (!('default' in api.version)) {
                 return memo;
               }
-              const apiPath = api.path.replace(new RegExp(`^${basePath}`), '');
+              const apiPath = relative(basePath, api.path);
               // msio ignore params in path
               if (apiPath.indexOf(':') >= 0) {
                 return memo;
@@ -605,7 +611,7 @@ export default async function koactDocToDefinition(options: IOptions) {
                 POST: 'Requester',
               }[method as 'GET' | 'PUT' | 'POST'];
               const apiData = api.version.default;
-              const apiName = apiPath.slice(1).split('/').map((e, index) => {
+              const apiName = apiPath.split('/').map((e, index) => {
                 if (!e) {
                   return 'root';
                 }
@@ -617,7 +623,7 @@ export default async function koactDocToDefinition(options: IOptions) {
               const responseTypeNode = schemaSummaryToTypeNode(apiData.res, typeNodes, `${apiName}Response`);
               const responseTypeNodeCheckOptional = apiData.res?.required ? responseTypeNode : ts.createUnionTypeNode([responseTypeNode, ts.createTypeReferenceNode('undefined', undefined)]);
               const parameters: ts.ParameterDeclaration[] = [];
-              const apiPathExpression = ts.createStringLiteral(apiPath);
+              const apiPathExpression = ts.createStringLiteral(`/${apiPath}`);
               // only reader use query
               const isFetcher = apiNameSuffix === 'Fetcher';
               if (isFetcher && apiData.query) {
@@ -635,19 +641,19 @@ export default async function koactDocToDefinition(options: IOptions) {
                 statements.push(ts.createReturn(ts.createCall(
                   ts.createPropertyAccess(ts.createThis(), '_fetcherWrapper'),
                   [responseTypeNodeCheckOptional],
-                  [apiPathExpression, ts.createIdentifier('params')],
+                  [apiPathExpression, ...(apiData.query ? [ts.createIdentifier('params')] : [])],
                 )));
               } else if (isDispatcher) {
                 statements.push(ts.createReturn(ts.createCall(
                   ts.createPropertyAccess(ts.createThis(), '_dispatcherWrapper'),
                   undefined,
-                  [apiPathExpression, ts.createIdentifier('body')],
+                  [apiPathExpression, ...(apiData.body ? [ts.createIdentifier('body')] : [])],
                 )));
               } else if (isRequester) {
                 statements.push(ts.createReturn(ts.createCall(
                   ts.createPropertyAccess(ts.createThis(), '_requesterWrapper'),
                   undefined,
-                  [apiPathExpression, ts.createIdentifier('body')],
+                  [apiPathExpression, ...(apiData.body ? [ts.createIdentifier('body')] : [])],
                 )));
               }
               memo.push(ts.addSyntheticLeadingComment(ts.createMethod(

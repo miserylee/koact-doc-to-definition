@@ -1,4 +1,19 @@
-{
-  "url": "http://localhost:3000",
-  "destination": "./apis"
-}
+[
+  {
+    "url": "http://localhost:3000",
+    "destination": "test/apis/axios",
+    "docSecret": "123456",
+    "target": "axios",
+    "pattern": [
+      "**",
+      "!/ms/*"
+    ]
+  },
+  {
+    "url": "http://localhost:3000",
+    "destination": "test/apis/msio",
+    "docSecret": "123456",
+    "target": "msio",
+    "pattern": "/ms/*"
+  }
+]
