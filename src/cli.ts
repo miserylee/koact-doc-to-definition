@@ -27,8 +27,10 @@ if (!Array.isArray(optionsArray)) {
     if (!options.url) {
       throw new Error(`[Config_${index}] 'url' should set in config file.`);
     }
+    console.log(`[Config_${index}] Start generating api file from ${options.url}, destination is ${options.destination}`);
     await koactDocToDefinition(options);
     console.log(`[Config_${index}] Generate api files done!`);
+    console.log();
   }
 })().catch(e => {
   throw e;
